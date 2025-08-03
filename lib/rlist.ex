@@ -56,8 +56,7 @@ defmodule RList do
     %RList{list: [h | (t ++ [h])], ptr: 1}
   end
   def new(_.._//_ = range) do
-    [h | t] = Range.to_list(range)
-    %RList{list: [h | (t ++ [h])], ptr: 1}
+    range |> Range.to_list() |> new()
   end
 
   def from_range(_.._//_ = range), do: new(range)

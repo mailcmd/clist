@@ -51,11 +51,11 @@ defmodule RList do
   ## API
   #################################################################################################
 
-  def new([_] = list) do
+  def new(list) when is_list(list) do
     [h | t] = list
     %RList{list: [h | (t ++ [h])], ptr: 1}
   end
-  def new(_.._//_ = range) do
+  def new(_a.._b//_c = range) do
     range |> Range.to_list() |> new()
   end
 
@@ -69,33 +69,70 @@ defmodule RList do
     List.to_tuple(to_list(rlist))
   end
 
+  def reset(rlist) do
+    ptr(rlist, 1)
+  end
+
   def take(_, 0), do: []
-  def take(rlist, count) do
+  def take(%RList{} = rlist, count) do
     {value, rlist} = next(rlist)
     [ value ] ++ take(rlist, count - 1)
   end
-
-  def reset(rlist) do
-    new(Enum.slice(rlist, rlist.ptr-1, length(rlist.list)) ++ Enum.slice(rlist, 0, rlist.ptr-1))
+  def take(%Stream{} = stream, count) do
+    rlist = stream.enum
+    {value, rlist} = next(rlist)
+    [ value ] ++ take(%Stream{stream | enum: rlist}, count - 1)
   end
 
   def next(rlist) do
     match([value | _]) = rlist
-    new_rlist = rotate(rlist)
+    new_rlist = forward(rlist)
     {value , new_rlist}
   end
 
-  def rotate(rlist) do
+  def forward(rlist, count \\ 1)
+  def forward(rlist, 0), do: rlist
+  def forward(rlist, count) do
     len = size(rlist)
     %RList{list: [_ | [h | t]], ptr: ptr} = rlist
     ptr = ptr == len && 1 || (ptr + 1)
-    %RList{list: [h | (t ++ [h])], ptr: ptr}
+    %RList{list: [h | (t ++ [h])], ptr: ptr} |> forward(count - 1)
   end
+  # Just for backward compatibility
+  # TODO: remove from the next version
+  @doc false
+  def rotate(rlist), do: forward(rlist)
 
   def to_list(rlist) do
-    Enum.slice(rlist.list, 0, size(rlist))
+    :lists.sublist(rlist.list, 1, size(rlist))
   end
 
+  def ptr(rlist), do: rlist.ptr
+  def ptr(%RList{list: list} = rlist, new_ptr) when is_integer(new_ptr) and new_ptr > 0 and new_ptr < length(list) do
+    ptr_helper(rlist, new_ptr)
+  end
+  defp ptr_helper(%RList{ptr: ptr} = rlist, new_ptr) when new_ptr == ptr, do: rlist
+  defp ptr_helper(%RList{ptr: ptr} = rlist, new_ptr) when new_ptr > ptr do
+    off = new_ptr - ptr + 1
+    %RList{rlist |
+      list:
+        :lists.sublist(rlist.list, off, size(rlist)-off+1)
+        ++
+        :lists.sublist(rlist.list, 1, off),
+      ptr: new_ptr
+    }
+  end
+  defp ptr_helper(%RList{ptr: ptr} = rlist, new_ptr) when new_ptr < ptr do
+    len = size(rlist)
+    off =  len - (ptr - new_ptr) + 1
+    %RList{rlist |
+      list:
+        :lists.sublist(rlist.list, off, size(rlist)-off+1)
+        ++
+        :lists.sublist(rlist.list, 1, off),
+      ptr: new_ptr
+    }
+  end
 end
 
 #################################################################################################
@@ -123,13 +160,20 @@ defimpl Enumerable, for: RList do
     {:ok, rlist |> RList.to_list() |> Enum.member?(value)}
   end
 
+  def reduce(rlist, {:cont, [{[], count}]} = acc, fun) do
+    rlist |>  RList.take(count) |> Enumerable.reduce(acc, fun)
+  end
   def reduce(rlist, acc, fun) do
-    rlist.list |>  RList.to_list() |> Enumerable.List.reduce(acc, fun)
+    rlist |>  RList.to_list() |> Enumerable.reduce(acc, fun)
   end
 
   def slice(rlist) do
-    len = RList.size(rlist)
-    {:ok, len, &RList.to_list/1}
+    fun = &slicing_fun(rlist, &1, &2, &3)
+    {:ok, 9_999_999, fun}
+  end
+
+  defp slicing_fun(rlist, start, amount, _step) do
+    rlist |> RList.ptr(start+1) |> RList.take(amount)
   end
 end
 
@@ -142,6 +186,6 @@ defmodule Tests2 do
     IO.puts "H: #{h}"
     IO.inspect t, label: "T"
     :timer.sleep(1000)
-    test(rotate t)
+    test(forward t)
   end
 end

@@ -1,4 +1,4 @@
-# CircularList (or CList)
+# Circular Lists (CList Module)
 
 CList allow to work with circular lists. A circular lists is a finite list that can be traversed
 as if it were infinite. This is possible because in a circular list, it is assumed that a copy of

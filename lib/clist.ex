@@ -1,4 +1,4 @@
-defmodule RList do
+defmodule CList do
   @moduledoc "README.md" |> File.read!()
 
   @enforce_keys [ :list, :ptr ]
@@ -6,18 +6,18 @@ defmodule RList do
 
   defmacro __using__(_) do
     quote do
-      require RList
+      require CList
     end
   end
 
-  @type t() :: %RList{}
+  @type t() :: %CList{}
 
   @doc """
-  Used to match RList in the style of erlang list pattern. Ex:
+  Used to match CList in the style of erlang list pattern. Ex:
   ```elixir
   defmodule Tests do
-    use RList
-    import RList
+    use CList
+    import CList
 
     def test(match [h | t]) do
       IO.puts "H: \#{h}"
@@ -27,24 +27,24 @@ defmodule RList do
     end
   end
 
-  rl = RList.new([1,2,3])
+  rl = CList.new([1,2,3])
   Tests.test(rl)
   ## Output:
   H: 1
-  T: #RList[1, 2, 3]/1
+  T: #CList[1, 2, 3]/1
   H: 2
-  T: #RList[2, 3, 1]/2
+  T: #CList[2, 3, 1]/2
   H: 3
-  T: #RList[3, 1, 2]/3
+  T: #CList[3, 1, 2]/3
   H: 1
-  T: #RList[1, 2, 3]/1
+  T: #CList[1, 2, 3]/1
   H: 2
-  T: #RList[2, 3, 1]/2
+  T: #CList[2, 3, 1]/2
   ...
   ...
   ```
-  Combining `match` and `forward/1` you can go through a RList in a very similar way to how you do
-  it with Erlang lists. You must not forget that, since RLists are endless, you must provide an
+  Combining `match` and `forward/1` you can go through a CList in a very similar way to how you do
+  it with Erlang lists. You must not forget that, since CLists are endless, you must provide an
   exit condition when appropriate.
   """
   defmacro match([{:|, _, [h, t]}]) do
@@ -52,7 +52,7 @@ defmodule RList do
     [
       {:%, [],
        [
-         {:__aliases__, [alias: false], [:RList]},
+         {:__aliases__, [alias: false], [:CList]},
          {:%{}, [],
           [
             list: [
@@ -73,7 +73,7 @@ defmodule RList do
   defmacro from_list(list) do
     quote do
       [h | t] = unquote(list)
-      %RList{list: [h | (t ++ [h])], ptr: 1}
+      %CList{list: [h | (t ++ [h])], ptr: 1}
     end
   end
 
@@ -90,17 +90,17 @@ defmodule RList do
   #################################################################################################
 
   @doc """
-  Create a new RList from a list or a range. The initial list/range will be the original list and
-  the pointer of the RList will be initialized to 1.
+  Create a new CList from a list or a range. The initial list/range will be the original list and
+  the pointer of the CList will be initialized to 1.
   ```elixir
-  iex> rl = RList.new([1, 2, 3, 4, 5])
-  #RList[1, 2, 3, 4, 5]/1
+  iex> rl = CList.new([1, 2, 3, 4, 5])
+  #CList[1, 2, 3, 4, 5]/1
   ```
   """
-  @spec new(list :: list() | Range.t()) :: RList.t()
+  @spec new(list :: list() | Range.t()) :: CList.t()
   def new(list) when is_list(list) do
     [h | t] = list
-    %RList{list: [h | (t ++ [h])], ptr: 1}
+    %CList{list: [h | (t ++ [h])], ptr: 1}
   end
   def new(_a.._b//_c = range) do
     range |> Range.to_list() |> new()
@@ -109,13 +109,13 @@ defmodule RList do
   @doc """
   Just an alias for `new(range)`.
   """
-  @spec from_range(range :: Range.t()) :: RList.t()
+  @spec from_range(range :: Range.t()) :: CList.t()
   def from_range(_.._//_ = range), do: new(range)
 
   @doc """
   Return the size of the original list.
   """
-  @spec size(rlist :: RList.t()) :: non_neg_integer()
+  @spec size(rlist :: CList.t()) :: non_neg_integer()
   def size(rlist) do
     length(rlist.list) - 1
   end
@@ -123,16 +123,16 @@ defmodule RList do
   @doc """
   Return the current list as a tuple.
   """
-  @spec to_tuple(rlist :: RList.t()) :: tuple()
+  @spec to_tuple(rlist :: CList.t()) :: tuple()
   def to_tuple(rlist) do
     List.to_tuple(to_list(rlist))
   end
 
   @doc """
-  Reset the pointer of the list to 1 and return the new RList. It is equivalent to call
+  Reset the pointer of the list to 1 and return the new CList. It is equivalent to call
   `ptr(rlist, 1)`.
   """
-  @spec reset(rlist :: RList.t()) :: RList.t()
+  @spec reset(rlist :: CList.t()) :: CList.t()
   def reset(rlist) do
     ptr(rlist, 1)
   end
@@ -140,9 +140,9 @@ defmodule RList do
   @doc """
   It is the same that call `Enum.take(rlist, count)`.
   """
-  @spec take(rlist :: RList.t(), count :: non_neg_integer()) :: list()
+  @spec take(rlist :: CList.t(), count :: non_neg_integer()) :: list()
   def take(_, 0), do: []
-  def take(%RList{} = rlist, count) do
+  def take(%CList{} = rlist, count) do
     {value, rlist} = next(rlist)
     [ value ] ++ take(rlist, count - 1)
   end
@@ -153,20 +153,20 @@ defmodule RList do
   end
 
   @doc """
-  Take a RList, extract the first value of the current list and move de pointer 1 unit. Return the
-  value and the new RList.
+  Take a CList, extract the first value of the current list and move de pointer 1 unit. Return the
+  value and the new CList.
   ```elixir
-  iex> rl = RList.new([1, 2, 3, 4, 5])
-  #RList[1, 2, 3, 4, 5]/1
+  iex> rl = CList.new([1, 2, 3, 4, 5])
+  #CList[1, 2, 3, 4, 5]/1
 
-  iex> {value, rl} = RList.next(rl)
-  {1, #RList[2, 3, 4, 5, 1]/2}
+  iex> {value, rl} = CList.next(rl)
+  {1, #CList[2, 3, 4, 5, 1]/2}
 
-  iex> {value, rl} = RList.next(rl)
-  {2, #RList[3, 4, 5, 1, 2]/3}
+  iex> {value, rl} = CList.next(rl)
+  {2, #CList[3, 4, 5, 1, 2]/3}
   ```
   """
-  @spec next(rlist :: RList.t()) :: {term(), RList.t()}
+  @spec next(rlist :: CList.t()) :: {term(), CList.t()}
   def next(rlist) do
     match([value | _]) = rlist
     new_rlist = forward(rlist)
@@ -174,26 +174,26 @@ defmodule RList do
   end
 
   @doc """
-  Take a RList, move de pointer count units and return the new RList.
+  Take a CList, move de pointer count units and return the new CList.
   ```elixir
-  iex> rl = RList.new([1, 2, 3, 4, 5])
-  #RList[1, 2, 3, 4, 5]/1
+  iex> rl = CList.new([1, 2, 3, 4, 5])
+  #CList[1, 2, 3, 4, 5]/1
 
-  iex> rl = RList.forward(rl)
-  #RList[2, 3, 4, 5, 1]/2
+  iex> rl = CList.forward(rl)
+  #CList[2, 3, 4, 5, 1]/2
 
-  iex> rl = RList.forward(rl, 3)
-  #RList[5, 1, 2, 3, 4]/5
+  iex> rl = CList.forward(rl, 3)
+  #CList[5, 1, 2, 3, 4]/5
   ```
   """
-  @spec forward(rlist :: RList.t(), count :: non_neg_integer() \\ 1) :: RList.t()
+  @spec forward(rlist :: CList.t(), count :: non_neg_integer()) :: CList.t()
   def forward(rlist, count \\ 1)
   def forward(rlist, 0), do: rlist
   def forward(rlist, count) do
     len = size(rlist)
-    %RList{list: [_ | [h | t]], ptr: ptr} = rlist
+    %CList{list: [_ | [h | t]], ptr: ptr} = rlist
     ptr = ptr == len && 1 || (ptr + 1)
-    %RList{list: [h | (t ++ [h])], ptr: ptr} |> forward(count - 1)
+    %CList{list: [h | (t ++ [h])], ptr: ptr} |> forward(count - 1)
   end
   # Just for backward compatibility
   # TODO: remove from the next version
@@ -201,9 +201,9 @@ defmodule RList do
   def rotate(rlist), do: forward(rlist)
 
   @doc """
-  Take a RList and return the current list (not the original list).
+  Take a CList and return the current list (not the original list).
   """
-  @spec to_list(rlist :: RList.t()) :: list()
+  @spec to_list(rlist :: CList.t()) :: list()
   def to_list(rlist) do
     :lists.sublist(rlist.list, 1, size(rlist))
   end
@@ -211,7 +211,7 @@ defmodule RList do
   @doc """
   Return the current value of the pointer.
   """
-  @spec ptr(rlist :: RList.t()) :: non_neg_integer()
+  @spec ptr(rlist :: CList.t()) :: non_neg_integer()
   def ptr(rlist), do: rlist.ptr
 
 
@@ -219,14 +219,14 @@ defmodule RList do
   Set the current value of the pointer, adjust the list according to the pointer value and returns
   the new list.
   """
-  @spec ptr(rlist :: RList.t(), ptr :: non_neg_integer()) :: RList.t()
-  def ptr(%RList{list: list} = rlist, new_ptr) when is_integer(new_ptr) and new_ptr > 0 and new_ptr < length(list) do
+  @spec ptr(rlist :: CList.t(), ptr :: non_neg_integer()) :: CList.t()
+  def ptr(%CList{list: list} = rlist, new_ptr) when is_integer(new_ptr) and new_ptr > 0 and new_ptr < length(list) do
     ptr_helper(rlist, new_ptr)
   end
-  defp ptr_helper(%RList{ptr: ptr} = rlist, new_ptr) when new_ptr == ptr, do: rlist
-  defp ptr_helper(%RList{ptr: ptr} = rlist, new_ptr) when new_ptr > ptr do
+  defp ptr_helper(%CList{ptr: ptr} = rlist, new_ptr) when new_ptr == ptr, do: rlist
+  defp ptr_helper(%CList{ptr: ptr} = rlist, new_ptr) when new_ptr > ptr do
     off = new_ptr - ptr + 1
-    %RList{rlist |
+    %CList{rlist |
       list:
         :lists.sublist(rlist.list, off, size(rlist)-off+1)
         ++
@@ -234,10 +234,10 @@ defmodule RList do
       ptr: new_ptr
     }
   end
-  defp ptr_helper(%RList{ptr: ptr} = rlist, new_ptr) when new_ptr < ptr do
+  defp ptr_helper(%CList{ptr: ptr} = rlist, new_ptr) when new_ptr < ptr do
     len = size(rlist)
     off =  len - (ptr - new_ptr) + 1
-    %RList{rlist |
+    %CList{rlist |
       list:
         :lists.sublist(rlist.list, off, size(rlist)-off+1)
         ++
@@ -247,11 +247,11 @@ defmodule RList do
   end
 
   @doc """
-  Compare 2 RList and return true if both original list are equals or false otherwise.
+  Compare 2 CList and return true if both original list are equals or false otherwise.
   """
-  @spec equals?(left :: RList.t(), right :: RList.t()) :: boolean()
+  @spec equals?(left :: CList.t(), right :: CList.t()) :: boolean()
   def equals?(left, right) do
-    left |> RList.ptr(1) |> Map.get(:list) == right |> RList.ptr(1) |> Map.get(:list)
+    left |> CList.ptr(1) |> Map.get(:list) == right |> CList.ptr(1) |> Map.get(:list)
   end
 
 end
@@ -259,40 +259,40 @@ end
 #################################################################################################
 ## Protocols implementations
 #################################################################################################
-defimpl Inspect, for: RList do
+defimpl Inspect, for: CList do
   import Inspect.Algebra
   def inspect(rlist, opts) do
-    concat(["#RList", to_doc( RList.to_list(rlist), opts), "/#{rlist.ptr}"])
+    concat(["#CList", to_doc( CList.to_list(rlist), opts), "/#{rlist.ptr}"])
   end
 end
 
-defimpl String.Chars, for: RList do
+defimpl String.Chars, for: CList do
   def to_string(rlist) do
-    rlist |> RList.to_list() |> String.Chars.to_string()
+    rlist |> CList.to_list() |> String.Chars.to_string()
   end
 end
 
-defimpl Enumerable, for: RList do
+defimpl Enumerable, for: CList do
   def count(rlist) do
-    rlist |> RList.to_list() |> Enumerable.count()
+    rlist |> CList.to_list() |> Enumerable.count()
   end
 
   def member?(rlist, value) do
-    {:ok, rlist |> RList.to_list() |> Enum.member?(value)}
+    {:ok, rlist |> CList.to_list() |> Enum.member?(value)}
   end
 
   # For Streams
   def reduce(rlist, {:cont, [{[], count}]} = acc, fun) do
-    rlist |>  RList.take(count) |> Enumerable.reduce(acc, fun)
+    rlist |>  CList.take(count) |> Enumerable.reduce(acc, fun)
   end
-  # For RLists
+  # For CLists
   def reduce(rlist, {:cont, {[], count}} = acc, fun) do
-    rlist |>  RList.take(count) |> Enumerable.reduce(acc, fun)
+    rlist |>  CList.take(count) |> Enumerable.reduce(acc, fun)
   end
-  # Fallback trait RList as a common list
+  # Fallback trait CList as a common list
   def reduce(rlist, acc, fun) do
     # IO.inspect {rlist, acc, fun}
-    rlist |>  RList.to_list() |> Enumerable.reduce(acc, fun)
+    rlist |>  CList.to_list() |> Enumerable.reduce(acc, fun)
   end
 
   def slice(rlist) do
@@ -301,19 +301,27 @@ defimpl Enumerable, for: RList do
   end
 
   defp slicing_fun(rlist, start, amount, _step) do
-    rlist |> RList.ptr(start+1) |> RList.take(amount)
+    rlist |> CList.ptr(start+1) |> CList.take(amount)
   end
 end
 
 
 #################################################################################################
-# defmodule Tests2 do
-#   use RList
+defmodule TestCList do
+  use CList
+  import CList, only: [match: 1, forward: 1]
 
-#   def test(RList.match [h | t]) do
-#     IO.puts "H: #{h}"
-#     IO.inspect t, label: "T"
-#     :timer.sleep(1000)
-#     test(RList.forward t)
-#   end
-# end
+  def hello do
+    ["h", "e", "l", "l", "o", " ", "w", "o", "r", "l", "d", "! "]
+      |> CList.new()
+      |> say_hello_but_in_a_cool_way()
+  end
+
+  def say_hello_but_in_a_cool_way(cl, count \\ 5)
+  def say_hello_but_in_a_cool_way(_, 0), do: IO.write("\n")
+  def say_hello_but_in_a_cool_way( match([c | l]), count) do
+    IO.write(c)
+    :timer.sleep(200)
+    say_hello_but_in_a_cool_way( forward(l), count - (c == "! " && 1 || 0))
+  end
+end

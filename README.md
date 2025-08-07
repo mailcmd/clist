@@ -19,17 +19,17 @@ As you can see a list and a pointer will always be displayed. If you move the po
 will look different, but internally the *original list* will be the same.
 
 ```elixir
-iex> rl = CList.new([1, 2, 3, 4, 5])
+iex> a = CList.new([1, 2, 3, 4, 5])
 #CList[1, 2, 3, 4, 5]/1
 
-iex> rl2 = CList.forward(rl)
+iex> b = CList.forward(a)
 #CList[2, 3, 4, 5, 1]/2
 
-iex> CList.equals?(rl, rl2)
+iex> CList.equals?(a, b)
 true
 ```
-In the case of `rl` and `rl2` both, the list and the pointer, differ, but the `CList`s are equals 
-because their sequential list are the same.
+In the case of `a` and `b` both, the list and the pointer, differ, but the `CList`s are equals 
+because their sequential lists are the same.
 
 And talking about the concept of `equal` on `CList`s, it is important to note that 2 `CList`s are 
 considered equal if they have the same size and their traversal sequence is exactly the same.
@@ -37,12 +37,16 @@ considered equal if they have the same size and their traversal sequence is exac
 ```elixir
 iex> a = CList.new [1, 2, 3, 4, 5, 6]
 #CList[1, 2, 3, 4, 5, 6]/1
+
 iex> b = CList.new [5, 6, 1, 2, 3, 4]
 #CList[5, 6, 1, 2, 3, 4]/1
+
 iex> CList.equals?(a, b)
 true
+
 iex> b = CList.new [6, 5, 1, 2, 3, 4]
 #CList[6, 5, 1, 2, 3, 4]/1
+
 iex> CList.equals?(a, b)
 false
 ```
@@ -54,12 +58,12 @@ also store what we will call the *original list*, which is the *current list* wh
 equal to 1.
 
 ```elixir 
-iex> rl = CList.new([:a, :b, :c, :d, :e])
+iex> a = CList.new([:a, :b, :c, :d, :e])
 #CList[:a, :b, :c, :d, :e]/1 
 ## Original list: [:a, :b, :c, :d, :e]
 ## Current list: [:a, :b, :c, :d, :e]
 
-iex> CList.forward(rl, 3)
+iex> CList.forward(a, 3)
 #CList[:d, :e, :a, :b, :c]/4
 ## Original list: [:a, :b, :c, :d, :e]
 ## Current list: [:d, :e, :a, :b, :c]
@@ -90,13 +94,13 @@ means that the first value in the *current list* is equivalent to the value with
 CList implements Enumerable, so you can play with Streams or use Enum.* functions.
 
 ```elixir
-iex> rl = CList.new([1, 2, 3, 4, 5])
+iex> a = CList.new([1, 2, 3, 4, 5])
 #CList[1, 2, 3, 4, 5]/1
 
-iex> Enum.take(rl, 20)
+iex> Enum.take(a, 20)
 [1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5]
 
-iex> rl 
+iex> a 
   |> Stream.map(fn v -> v * 3 end) 
   |> Stream.map(fn v -> v - 1 end) 
   |> Enum.take(22)
@@ -107,16 +111,16 @@ Since a CList could be iterated ad infinitum, the Enum.* functions that has not 
 take the *current list* of the CList as enumerable input. 
 
 ```elixir
-iex> rl = CList.new([1, 2, 3, 4, 5])
+iex> a = CList.new([1, 2, 3, 4, 5])
 #CList[1, 2, 3, 4, 5]/1
 
-iex> Enum.map(rl, fn v -> v * 2 end)
+iex> Enum.map(a, fn v -> v * 2 end)
 [2, 4, 6, 8, 10]
 
-iex> rl = CList.forward(rl, 3)
+iex> rl = CList.forward(a, 3)
 #CList[4, 5, 1, 2, 3]/4
 
-iex> Enum.map(rl, fn v -> v * 2 end)
+iex> Enum.map(a, fn v -> v * 2 end)
 [8, 10, 2, 4, 6]
 ```
 

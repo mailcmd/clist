@@ -328,6 +328,7 @@ end
 
 #################################################################################################
 defmodule TestCList do
+  @moduledoc false
   use CList
   import CList, only: [match: 1, forward: 1]
 

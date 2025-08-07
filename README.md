@@ -1,7 +1,5 @@
 # Circular Lists (CList Module)
 
-al llegar al final de la lista se vuelve al principio y se toma el primer elemento de la lista como si estuviera a continuación del último.
-
 `CList` allow to work with circular lists. A circular lists is a finite list that can be traversed
 as if it were infinite. This is possible because in a circular list, when you reach the end of the 
 list, you go back to the beginning and take the first element of the list as if it were next to 

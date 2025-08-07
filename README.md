@@ -28,7 +28,7 @@ iex> b = CList.forward(a)
 iex> CList.equals?(a, b)
 true
 ```
-In the case of `a` and `b` both, the list and the pointer, differ, but the `CList`s are equals 
+You can see that the list and the pointer of `a` and `b` differs, but the `CList`s are equals 
 because their sequential lists are the same.
 
 And talking about the concept of `equal` on `CList`s, it is important to note that 2 `CList`s are 

@@ -126,7 +126,7 @@ iex> Enum.map(a, fn v -> v * 2 end)
 
 ## TODO
                       
-One million tests ¯\_(ツ)_/¯ 
+One million tests ¯\\_(ツ)_/¯ 
 
 ## How to use
 

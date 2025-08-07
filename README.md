@@ -29,25 +29,22 @@ iex> CList.equals?(rl, rl2)
 true
 ```
 In the case of `rl` and `rl2` both, the list and the pointer, differ, but the `CList`s are equals 
-because their *original lists* are the same.
+because their sequential list are the same.
 
-It is important to clarify what the pointer value means. When the pointer is, for example, 2, it
-means that the first value in the *current list* (see below **original and current list**) is 
-equivalent to the value with index 2 in the *original list* (remember, indexes in `CList` work on a 
-base 1).
+And talking about the concept of `equal` on `CList`s, it is important to note that 2 `CList`s are 
+considered equal if they have the same size and their traversal sequence is exactly the same.
 
 ```elixir
-## When pointer is 1, you see the original list
-#CList[1, 2, 3, 4, 5]/1
-          ^
-          |
-          +----------------------------------------------+
-                                                         |
-## When pointer is not 1, you see the list rotatated     |
-#CList[2, 3, 4, 5, 1]/2                                  |
-                      |                                  |
-                      +----------------------------------+
-
+iex> a = CList.new [1, 2, 3, 4, 5, 6]
+#CList[1, 2, 3, 4, 5, 6]/1
+iex> b = CList.new [5, 6, 1, 2, 3, 4]
+#CList[5, 6, 1, 2, 3, 4]/1
+iex> CList.equals?(a, b)
+true
+iex> b = CList.new [6, 5, 1, 2, 3, 4]
+#CList[6, 5, 1, 2, 3, 4]/1
+iex> CList.equals?(a, b)
+false
 ```
 
 ## Original and current list
@@ -66,6 +63,25 @@ iex> CList.forward(rl, 3)
 #CList[:d, :e, :a, :b, :c]/4
 ## Original list: [:a, :b, :c, :d, :e]
 ## Current list: [:d, :e, :a, :b, :c]
+
+```
+## The pointer
+
+Now is time to explain what the pointer value means. When the pointer is, for example, 2, it
+means that the first value in the *current list* is equivalent to the value with index 2 in the 
+*original list* (remember, indexes in `CList` work on a base 1).
+
+```elixir
+## When pointer is 1, you see the original list
+#CList[1, 2, 3, 4, 5]/1
+          ^
+          |
+          +----------------------------------------------+
+                                                         |
+## When pointer is not 1, you see the list rotatated     |
+#CList[2, 3, 4, 5, 1]/2                                  |
+                      |                                  |
+                      +----------------------------------+
 
 ```
 

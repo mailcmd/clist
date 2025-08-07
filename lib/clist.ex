@@ -253,12 +253,26 @@ defmodule CList do
   @spec equals?(left :: CList.t(), right :: CList.t()) :: boolean()
   def equals?(%CList{list: left}, %CList{list: right}) when length(left) != length(right), do: false
   def equals?(left, right) do
-    :lists.subtract(
-      to_list(left),
-      take(right, size(right) * 2)
-    ) == []
+    # Look for the left CList in the list resulting of repeat 2 times the right CList
+    list_contains_in_order?(
+      take(right, size(right) * 2),
+      to_list(left)
+    )
     # left |> CList.ptr(1) |> Map.get(:list) == right |> CList.ptr(1) |> Map.get(:list)
   end
+
+  # Credit for Alan and taken from
+  # https://stackoverflow.com/questions/62711039/list-contains-another-list-in-the-same-order
+  @spec list_contains_in_order?(List.t(), List.t()) :: boolean
+  defp list_contains_in_order?([], _), do: false
+  defp list_contains_in_order?(container, contained) do
+    if List.starts_with?(container, contained) do
+      true
+    else
+      list_contains_in_order?(tl(container), contained)
+    end
+  end
+
 
 end
 

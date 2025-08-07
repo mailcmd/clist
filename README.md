@@ -53,9 +53,9 @@ false
 
 ## Original and current list
 
-A CList physically stores what we will call the *current list* (i.e., the rotated list) and implicitly 
-also store what we will call the *original list*, which is the *current list* when the pointer is 
-equal to 1.
+What `CList` stores at all times is what we call the *current list* (i.e., the rotated list) but 
+implicitly also store what we will call the *original list*, which is the *current list* when the 
+pointer is equal to 1.
 
 ```elixir 
 iex> a = CList.new([:a, :b, :c, :d, :e])
@@ -91,7 +91,7 @@ means that the first value in the *current list* is equivalent to the value with
 
 ## Enumerable
 
-CList implements Enumerable, so you can play with Streams or use Enum.* functions.
+`CList` implements `Enumerable`, so you can play with `Streams` or use `Enum.*` functions.
 
 ```elixir
 iex> a = CList.new([1, 2, 3, 4, 5])
@@ -107,8 +107,8 @@ iex> a
 [2, 5, 8, 11, 14, 2, 5, 8, 11, 14, 2, 5, 8, 11, 14, 2, 5, 8, 11, 14, 2, 5]
 ```
 
-Since a CList could be iterated ad infinitum, the Enum.* functions that has not stop condition will 
-take the *current list* of the CList as enumerable input. 
+Since a `CList` could be iterated ad infinitum, the `Enum.*` functions that has not stop condition 
+will take the *current list* of the `CList` as enumerable input. 
 
 ```elixir
 iex> a = CList.new([1, 2, 3, 4, 5])

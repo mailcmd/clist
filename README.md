@@ -6,7 +6,7 @@ list, you go back to the beginning and take the first element of the list as if 
 the last one. In other words, we could assume that a copy of the original list is inserted at the 
 end of the list, and so on ad infinitum.
 
-Internally a `CList` is a map that store the *original list* (see below **original and current list**) 
+Internally a `CList` is a map that store the *original list* (see below ()[original and current list]) 
 and a pointer indicating the current position in base 1 (as Erlang lists).
 
 Although internally a `CList` is a map, its visual representation (IO.inspect) is:
@@ -126,7 +126,7 @@ iex> Enum.map(a, fn v -> v * 2 end)
 
 ## TODO
                       
-One million tests ¯\\_(ツ)_/¯ 
+One million tests `¯\_(ツ)_/¯`
 
 ## How to use
 

@@ -1,13 +1,17 @@
 # Circular Lists (CList Module)
 
-CList allow to work with circular lists. A circular lists is a finite list that can be traversed
-as if it were infinite. This is possible because in a circular list, it is assumed that a copy of
-the original list is inserted at the end of the list, and so on infinitely.
+al llegar al final de la lista se vuelve al principio y se toma el primer elemento de la lista como si estuviera a continuación del último.
 
-Internally a CList is a map that store the *original list* (see below **original and current list**) 
+`CList` allow to work with circular lists. A circular lists is a finite list that can be traversed
+as if it were infinite. This is possible because in a circular list, when you reach the end of the 
+list, you go back to the beginning and take the first element of the list as if it were next to 
+the last one. In other words, we could assume that a copy of the original list is inserted at the 
+end of the list, and so on ad infinitum.
+
+Internally a `CList` is a map that store the *original list* (see below **original and current list**) 
 and a pointer indicating the current position in base 1 (as Erlang lists).
 
-Although internally a CList is a map, its visual representation (IO.inspect) is:
+Although internally a `CList` is a map, its visual representation (IO.inspect) is:
 
 ```elixir
 iex> CList.new([1, 2, 3, 4, 5])
@@ -26,12 +30,12 @@ iex> rl2 = CList.forward(rl)
 iex> CList.equals?(rl, rl2)
 true
 ```
-In the case of `rl` and `rl2` both, the list and the pointer, differ, but the CLists are equals 
+In the case of `rl` and `rl2` both, the list and the pointer, differ, but the `CList`s are equals 
 because their *original lists* are the same.
 
 It is important to clarify what the pointer value means. When the pointer is, for example, 2, it
 means that the first value in the *current list* (see below **original and current list**) is 
-equivalent to the value with index 2 in the *original list* (remember, indexes in CList work on a 
+equivalent to the value with index 2 in the *original list* (remember, indexes in `CList` work on a 
 base 1).
 
 ```elixir

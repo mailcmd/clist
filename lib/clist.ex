@@ -247,11 +247,17 @@ defmodule CList do
   end
 
   @doc """
-  Compare 2 CList and return true if both original list are equals or false otherwise.
+  Compare 2 CList and return true if the sequence obtained when traversing both lists are equal
+  regardless of whether the original list is the same or not.
   """
   @spec equals?(left :: CList.t(), right :: CList.t()) :: boolean()
+  def equals?(%CList{list: left}, %CList{list: right}) when length(left) != length(right), do: false
   def equals?(left, right) do
-    left |> CList.ptr(1) |> Map.get(:list) == right |> CList.ptr(1) |> Map.get(:list)
+    :lists.subtract(
+      to_list(left),
+      take(right, size(right) * 2)
+    ) == []
+    # left |> CList.ptr(1) |> Map.get(:list) == right |> CList.ptr(1) |> Map.get(:list)
   end
 
 end

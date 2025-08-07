@@ -4,12 +4,16 @@ defmodule CList.MixProject do
   def project do
     [
       app: :clist,
+      name: "Circular List",
       description: "A module to work with circular lists. A circular lists is a finite list that can be traversed as if it were infinite.",
       version: "0.1.0",
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
       package: package(),
-      deps: deps()
+      deps: deps(),
+      docs: [
+        extras: ["README.md"]
+      ]
     ]
   end
 
@@ -29,7 +33,7 @@ defmodule CList.MixProject do
 
   defp package() do
     [
-      name: "clist",
+      name: "Circular List",
       description: "A module to work with circular lists. A circular lists is a finite list that can be traversed as if it were infinite.",
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/mailcmd/clist"},

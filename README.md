@@ -178,7 +178,7 @@ by adding `clist` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:rlist, "~> 0.1.0"}
+    {:clist, "~> 0.1.0"}
   ]
 end
 ```

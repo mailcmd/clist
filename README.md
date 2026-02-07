@@ -132,20 +132,44 @@ One million tests `¯\_(ツ)_/¯`
 
 ```elixir
 defmodule TestCList do
+
+  @sec_duration 50
+
   use CList
 
-  def hello do
-    ["h", "e", "l", "l", "o", " ", "w", "o", "r", "l", "d", "! "]
-      |> CList.new()
-      |> say_hello_but_in_a_cool_way()
+  def run(secs \\ 300) do
+    {h, m ,s} = Time.from_seconds_after_midnight(secs) |> Time.to_erl()
+    hours =  0..h |> CList.new() |> CList.forward(-1)
+    minutes =  0..59 |> CList.new() |> CList.forward(m)
+    seconds =  0..59 |> CList.new() |> CList.forward(s)
+    start(hours, minutes, seconds)
   end
 
-  def say_hello_but_in_a_cool_way(cl, count \\ 5)
-  def say_hello_but_in_a_cool_way(_, 0), do: IO.write("\n")
-  def say_hello_but_in_a_cool_way(CList.match([c | l]), count) do
-    IO.write(c)
-    :timer.sleep(200)
-    say_hello_but_in_a_cool_way(CList.forward(l), count - (c == "! " && 1 || 0))
+  defp start(CList.match([0 | _hh]), CList.match([0 | _mm]), CList.match([0 | _ss])) do
+    print_time(0,0,0)
+    IO.puts("\rBOOM!     ")    
+  end
+  defp start(CList.match([h | hh]), CList.match([0 | mm]), CList.match([0 | ss])) do
+    print_time(h, 0, 0)
+    start(CList.forward(hh, -1), CList.forward(mm, -1), CList.forward(ss, -1))
+  end
+  defp start(CList.match([h | hh]), CList.match([m | mm]), CList.match([0 | ss])) do
+    print_time(h, m, 0)
+    start(hh, CList.forward(mm, -1), CList.forward(ss, -1))
+  end
+  defp start(CList.match([h | hh]), CList.match([m | mm]), CList.match([s | ss])) do
+    print_time(h, m, s)
+    start(hh, mm, CList.forward(ss, -1))
+  end
+  
+  defp print_time(h, m, s) do
+    time = format(h) <> ":" <> format(m) <> ":" <> format(s)
+    IO.write("\r" <> time)
+    :timer.sleep(@sec_duration)
+  end
+
+  defp format(n) do
+    n |> to_string() |> String.pad_leading(2, "0")
   end
 end
 ```

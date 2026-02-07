@@ -6,7 +6,7 @@ defmodule CList.MixProject do
       app: :clist,
       name: "Circular List",
       description: "A module to work with circular lists. A circular lists is a finite list that can be traversed as if it were infinite.",
-      version: "0.1.1",
+      version: "0.1.3",
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
       package: package(),

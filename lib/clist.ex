@@ -174,7 +174,8 @@ defmodule CList do
   end
 
   @doc """
-  Take a `CList`, move de pointer count units and return the new `CList`.
+  Take a `CList`, move de pointer count units and return the new `CList`. You can put a negative
+  number here to move backward.
   ```elixir
   iex> rl = CList.new([1, 2, 3, 4, 5])
   #CList[1, 2, 3, 4, 5]/1
@@ -186,20 +187,45 @@ defmodule CList do
   #CList[5, 1, 2, 3, 4]/5
   ```
   """
-  @spec forward(clist :: CList.t(), count :: non_neg_integer()) :: CList.t()
+  @spec forward(clist :: CList.t(), count :: integer()) :: CList.t()
   def forward(clist, count \\ 1)
   def forward(clist, 0), do: clist
-  def forward(clist, count) do
+  def forward(clist, count) when count > 0 do
     len = size(clist)
     %CList{list: [_ | [h | t]], ptr: ptr} = clist
     ptr = ptr == len && 1 || (ptr + 1)
     %CList{list: [h | (t ++ [h])], ptr: ptr} |> forward(count - 1)
+  end
+  def forward(clist, count) do
+    len = size(clist)
+    t = clist.list |> Enum.reverse |> tl() |> Enum.reverse()
+    h = clist.list |> Enum.reverse |> tl() |> hd()
+    %CList{ptr: ptr} = clist
+    ptr = ptr == 1 && len || (ptr - 1)
+    %CList{list: [h | t], ptr: ptr} |> forward(count + 1)
   end
   # Just for backward compatibility
   # TODO: remove from the next version
   @doc false
   def rotate(clist), do: forward(clist)
 
+  @doc """
+  Take a `CList`, move de pointer backward count units and return the new `CList`. You can put a
+  negative number here to move forward.
+  ```elixir
+  iex> rl = CList.new([1, 2, 3, 4, 5])
+  #CList[1, 2, 3, 4, 5]/1
+
+  iex> rl = CList.backward(rl)
+  #CList[5, 1, 2, 3, 4]/5
+
+  iex> rl = CList.backward(rl, 3)
+  #CList[2, 3, 4, 5, 1]/2
+  ```
+  """
+  @spec backward(clist :: CList.t(), count :: non_neg_integer()) :: CList.t()
+  def backward(clist, count \\ 1), do: forward(clist, -count)
+  
   @doc """
   Take a `CList` and return the current list (not the original list).
   """
